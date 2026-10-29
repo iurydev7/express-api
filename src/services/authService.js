@@ -1,6 +1,7 @@
 import {validarCadastro,validarEndereco} from "../validators/authValidator.js";
 import { users } from "../repositories/index.js";
-import { AppError } from "../shared/error.js";
+import { AppError } from "../shared/errors.js";
+import { jwtExpireIn, jwtSecret } from "../config/env.js";
 import jwt from 'jsonwebtoken';
 import bcrypt from "bcryptjs";
 
@@ -25,7 +26,7 @@ async function autenticar({ email, password}) {
     if (!user || !(await bcrypt.compare(password || '', user.passwordHash))){
         throw new AppError('E-mail ou senha inválidos', 401);
     }
-    const token = jwt.sign({ sub: user.id, role: user.role }, );
+    const token = jwt.sign({ sub: user.id, role: user.role }, jwtSecret, { expiresIn: jwtExpireIn});
     return token;
 }
 
